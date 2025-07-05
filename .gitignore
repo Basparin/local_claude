@@ -1,0 +1,50 @@
+# LocalClaude - Archivos a ignorar
+
+# Base de datos y cache
+data/memory.db
+data/context_cache.json
+data/*.db
+data/*.json
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.backup_*
+
+# Logs
+*.log
+logs/
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+
+# Sandbox (área de pruebas)
+sandbox/
+test_*
+*_test.py
+*.test.*
+
+# Archivos de configuración local
+local_config.json
+user_settings.json

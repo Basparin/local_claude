@@ -1,0 +1,14 @@
+# LocalClaude - Dependencias principales
+# Comunicación con Ollama se hace via subprocess, sin dependencias extra
+
+# Futuras dependencias para fases avanzadas:
+# rich==13.7.0          # Para interfaz colorida avanzada (Fase 3)
+# sqlite3               # Incluido en Python estándar
+# pathlib               # Incluido en Python estándar
+# json                  # Incluido en Python estándar
+# subprocess            # Incluido en Python estándar
+
+# Dependencias opcionales para desarrollo:
+# pytest>=7.0.0         # Para tests
+# black>=22.0.0         # Para formateo
+# flake8>=4.0.0         # Para linting
