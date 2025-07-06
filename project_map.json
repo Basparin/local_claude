@@ -1,0 +1,731 @@
+{
+  "project_info": {
+    "name": "LocalClaude",
+    "version": "1.0",
+    "description": "CLI Inteligente con Ollama - Una CLI que replica las capacidades de Claude Code usando Ollama localmente",
+    "analysis_date": "2025-01-06",
+    "total_python_files": 20,
+    "entry_points": [
+      {
+        "file": "main.py",
+        "function": "main",
+        "description": "Punto de entrada principal de la aplicación"
+      }
+    ]
+  },
+  "architecture": {
+    "type": "CLI Application",
+    "pattern": "Modular Architecture",
+    "main_components": [
+      "Core Engine",
+      "Context Management", 
+      "Workspace Management",
+      "UI/Interface",
+      "Configuration",
+      "Security"
+    ]
+  },
+  "directories": {
+    "core": {
+      "description": "Motor principal de la CLI y componentes centrales",
+      "files": [
+        "cli_engine.py",
+        "command_processor.py", 
+        "ollama_interface.py"
+      ]
+    },
+    "context": {
+      "description": "Sistema de gestión de contexto y memoria persistente",
+      "files": [
+        "context_manager.py",
+        "compression.py",
+        "memory_store.py"
+      ]
+    },
+    "workspace": {
+      "description": "Exploración y manipulación del workspace",
+      "files": [
+        "explorer.py",
+        "file_manager.py",
+        "code_analyzer.py"
+      ]
+    },
+    "ui": {
+      "description": "Interfaz de usuario y formateo",
+      "files": [
+        "interface.py",
+        "formatting.py"
+      ]
+    },
+    "config": {
+      "description": "Configuración del sistema",
+      "files": [
+        "settings.py",
+        "models.py"
+      ]
+    },
+    "security": {
+      "description": "Controles de seguridad",
+      "files": [
+        "file_security.py"
+      ]
+    },
+    "tests": {
+      "description": "Suite de tests",
+      "files": [
+        "conftest.py",
+        "test_cli_engine.py",
+        "test_memory_store.py",
+        "test_file_manager.py",
+        "test_security.py",
+        "test_e2e.py"
+      ]
+    }
+  },
+  "classes": {
+    "CLIEngine": {
+      "file": "core/cli_engine.py",
+      "line": 21,
+      "description": "Motor principal de la CLI",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 24,
+          "params": ["settings: Settings"],
+          "description": "Inicializa todos los componentes del sistema"
+        },
+        {
+          "name": "run",
+          "line": 81,
+          "params": [],
+          "description": "Ejecutar la CLI principal - bucle principal"
+        },
+        {
+          "name": "_process_user_input",
+          "line": 115,
+          "params": ["user_input: str"],
+          "description": "Procesar entrada del usuario"
+        },
+        {
+          "name": "_handle_conversation",
+          "line": 134,
+          "params": ["user_input: str"],
+          "description": "Manejar conversación normal con la LLM"
+        }
+      ],
+      "dependencies": [
+        "OllamaInterface",
+        "ContextManager", 
+        "CommandProcessor",
+        "WorkspaceExplorer",
+        "FileManager",
+        "CodeAnalyzer",
+        "UserInterface"
+      ],
+      "has_tests": true
+    },
+    "CommandProcessor": {
+      "file": "core/command_processor.py",
+      "line": 7,
+      "description": "Procesador de comandos especiales de la CLI",
+      "methods": [
+        {
+          "name": "register_command",
+          "line": 15,
+          "params": ["command_name: str", "handler: Callable"],
+          "description": "Registrar un nuevo comando"
+        },
+        {
+          "name": "process_command",
+          "line": 19,
+          "params": ["user_input: str"],
+          "description": "Procesar un comando especial"
+        }
+      ],
+      "has_tests": false
+    },
+    "OllamaInterface": {
+      "file": "core/ollama_interface.py",
+      "line": 11,
+      "description": "Interfaz para comunicarse con Ollama",
+      "methods": [
+        {
+          "name": "test_connection",
+          "line": 33,
+          "params": [],
+          "description": "Probar conexión con Ollama"
+        },
+        {
+          "name": "chat",
+          "line": 99,
+          "params": ["messages: List[Dict[str, str]]", "model_name: str = None"],
+          "description": "Enviar mensajes a Ollama y obtener respuesta"
+        },
+        {
+          "name": "get_available_models",
+          "line": 176,
+          "params": [],
+          "description": "Obtener lista de modelos disponibles"
+        }
+      ],
+      "has_tests": false
+    },
+    "ContextManager": {
+      "file": "context/context_manager.py", 
+      "line": 11,
+      "description": "Gestor del contexto de conversación",
+      "methods": [
+        {
+          "name": "add_user_message",
+          "line": 27,
+          "params": ["content: str"],
+          "description": "Agregar mensaje del usuario"
+        },
+        {
+          "name": "add_assistant_message", 
+          "line": 46,
+          "params": ["content: str", "model_used: str = None"],
+          "description": "Agregar mensaje del asistente"
+        },
+        {
+          "name": "get_context_for_llm",
+          "line": 67,
+          "params": [],
+          "description": "Obtener contexto formateado para la LLM"
+        },
+        {
+          "name": "_compress_context",
+          "line": 98,
+          "params": [],
+          "description": "Comprimir contexto manteniendo mensajes recientes"
+        }
+      ],
+      "dependencies": ["MemoryStore"],
+      "has_tests": false
+    },
+    "ContextCompressor": {
+      "file": "context/compression.py",
+      "line": 11,
+      "description": "Compresor inteligente de contexto de conversaciones",
+      "methods": [
+        {
+          "name": "compress_messages",
+          "line": 25,
+          "params": ["messages: List[Dict[str, Any]]", "target_reduction: float = 0.5"],
+          "description": "Comprimir lista de mensajes manteniendo información importante"
+        },
+        {
+          "name": "create_session_summary",
+          "line": 64,
+          "params": ["messages: List[Dict[str, Any]]"],
+          "description": "Crear resumen completo de una sesión"
+        },
+        {
+          "name": "compress_code_context",
+          "line": 85,
+          "params": ["code_content: str", "max_length: int = 1000"],
+          "description": "Comprimir contexto de código manteniendo partes importantes"
+        }
+      ],
+      "has_tests": false
+    },
+    "MemoryStore": {
+      "file": "context/memory_store.py",
+      "line": 13,
+      "description": "Almacén de memoria persistente usando SQLite",
+      "methods": [
+        {
+          "name": "create_session",
+          "line": 109,
+          "params": ["workspace_path: str"],
+          "description": "Crear nueva sesión"
+        },
+        {
+          "name": "save_message",
+          "line": 152,
+          "params": ["session_id: str", "role: str", "content: str", "model_used: str = None", "tokens_used: int = 0", "metadata: Dict[str, Any] = None"],
+          "description": "Guardar mensaje de conversación"
+        },
+        {
+          "name": "get_session_history",
+          "line": 171,
+          "params": ["session_id: str"],
+          "description": "Obtener historial de una sesión"
+        },
+        {
+          "name": "register_project",
+          "line": 236,
+          "params": ["project_path: str", "project_name: str", "project_type: str = None", "languages: List[str] = None", "description: str = None", "metadata: Dict[str, Any] = None"],
+          "description": "Registrar proyecto en la memoria"
+        }
+      ],
+      "has_tests": true
+    },
+    "WorkspaceExplorer": {
+      "file": "workspace/explorer.py",
+      "line": 11,
+      "description": "Explorador inteligente del workspace",
+      "methods": [
+        {
+          "name": "list_files",
+          "line": 20,
+          "params": ["path: str = '.'"],
+          "description": "Listar archivos con información contextual"
+        },
+        {
+          "name": "show_file",
+          "line": 70,
+          "params": ["file_path: str"],
+          "description": "Mostrar contenido de un archivo con análisis"
+        },
+        {
+          "name": "search_pattern",
+          "line": 114,
+          "params": ["pattern: str", "path: str = '.'"],
+          "description": "Buscar patrón en archivos"
+        },
+        {
+          "name": "show_tree",
+          "line": 158,
+          "params": ["path: str = '.'", "max_depth: int = 3"],
+          "description": "Mostrar estructura de directorios"
+        }
+      ],
+      "has_tests": false
+    },
+    "FileManager": {
+      "file": "workspace/file_manager.py",
+      "line": 12,
+      "description": "Gestor de archivos con capacidades inteligentes",
+      "methods": [
+        {
+          "name": "create_file",
+          "line": 33,
+          "params": ["file_path: str", "content: str = None", "file_type: str = None"],
+          "description": "Crear un nuevo archivo con contenido inteligente"
+        },
+        {
+          "name": "edit_file",
+          "line": 76,
+          "params": ["file_path: str", "instructions: str"],
+          "description": "Editar un archivo existente con instrucciones en lenguaje natural"
+        },
+        {
+          "name": "build_project",
+          "line": 130,
+          "params": ["project_type: str", "project_name: str"],
+          "description": "Construir un proyecto completo desde cero"
+        },
+        {
+          "name": "generate_code",
+          "line": 160,
+          "params": ["description: str", "file_path: str = None"],
+          "description": "Generar código basado en descripción natural"
+        }
+      ],
+      "has_tests": true
+    },
+    "CodeAnalyzer": {
+      "file": "workspace/code_analyzer.py",
+      "line": 12,
+      "description": "Analizador inteligente de código y proyectos",
+      "methods": [
+        {
+          "name": "analyze_project",
+          "line": 20,
+          "params": ["path: str = '.'"],
+          "description": "Analizar un proyecto completo"
+        },
+        {
+          "name": "analyze_file",
+          "line": 47,
+          "params": ["file_path: str"],
+          "description": "Analizar un archivo específico"
+        },
+        {
+          "name": "find_issues",
+          "line": 82,
+          "params": ["path: str = '.'"],
+          "description": "Encontrar problemas potenciales en el código"
+        },
+        {
+          "name": "suggest_improvements",
+          "line": 128,
+          "params": ["file_path: str"],
+          "description": "Sugerir mejoras para un archivo"
+        },
+        {
+          "name": "calculate_complexity",
+          "line": 156,
+          "params": ["file_path: str"],
+          "description": "Calcular complejidad de un archivo Python"
+        }
+      ],
+      "has_tests": false
+    },
+    "UserInterface": {
+      "file": "ui/interface.py",
+      "line": 8,
+      "description": "Interfaz de usuario de la CLI",
+      "methods": [
+        {
+          "name": "show_welcome",
+          "line": 39,
+          "params": [],
+          "description": "Mostrar mensaje de bienvenida"
+        },
+        {
+          "name": "get_user_input",
+          "line": 61,
+          "params": [],
+          "description": "Obtener entrada del usuario"
+        },
+        {
+          "name": "show_response",
+          "line": 71,
+          "params": ["response: str"],
+          "description": "Mostrar respuesta del asistente"
+        },
+        {
+          "name": "get_help_text",
+          "line": 127,
+          "params": [],
+          "description": "Obtener texto de ayuda"
+        }
+      ],
+      "has_tests": false
+    },
+    "AdvancedFormatter": {
+      "file": "ui/formatting.py",
+      "line": 10,
+      "description": "Formateador avanzado para mejorar la presentación",
+      "methods": [
+        {
+          "name": "colorize",
+          "line": 89,
+          "params": ["text: str", "color: str", "style: str = None"],
+          "description": "Aplicar color y estilo al texto"
+        },
+        {
+          "name": "format_title",
+          "line": 100,
+          "params": ["title: str", "level: int = 1"],
+          "description": "Formatear título con decoración"
+        },
+        {
+          "name": "format_table",
+          "line": 142,
+          "params": ["headers: List[str]", "rows: List[List[str]]", "max_width: int = 80"],
+          "description": "Formatear tabla simple"
+        }
+      ],
+      "has_tests": false
+    },
+    "Settings": {
+      "file": "config/settings.py",
+      "line": 9,
+      "description": "Configuración global del sistema",
+      "methods": [
+        {
+          "name": "get_model_config",
+          "line": 55,
+          "params": ["model_name: str = None"],
+          "description": "Obtener configuración de un modelo específico"
+        },
+        {
+          "name": "should_use_fast_model",
+          "line": 77,
+          "params": ["task_type: str"],
+          "description": "Determinar si usar el modelo rápido para una tarea"
+        }
+      ],
+      "has_tests": false
+    },
+    "ModelManager": {
+      "file": "config/models.py",
+      "line": 9,
+      "description": "Gestor de modelos Ollama",
+      "methods": [
+        {
+          "name": "is_model_available",
+          "line": 47,
+          "params": ["model_name: str"],
+          "description": "Verificar si un modelo está disponible"
+        },
+        {
+          "name": "get_recommended_model",
+          "line": 62,
+          "params": ["task_type: str = 'general'"],
+          "description": "Obtener modelo recomendado para un tipo de tarea"
+        },
+        {
+          "name": "pull_model",
+          "line": 84,
+          "params": ["model_name: str"],
+          "description": "Descargar un modelo si no está disponible"
+        }
+      ],
+      "has_tests": false
+    },
+    "FileSecurityManager": {
+      "file": "security/file_security.py",
+      "line": 14,
+      "description": "Manages security policies for file operations",
+      "methods": [
+        {
+          "name": "validate_file_path",
+          "line": 71,
+          "params": ["file_path: str"],
+          "description": "Validate if a file path is safe for creation/editing"
+        },
+        {
+          "name": "validate_file_content",
+          "line": 134,
+          "params": ["content: str", "file_path: str"],
+          "description": "Validate file content for security issues"
+        },
+        {
+          "name": "register_file_creation",
+          "line": 194,
+          "params": ["file_path: str", "file_size: int"],
+          "description": "Register a file creation for tracking"
+        },
+        {
+          "name": "get_session_summary",
+          "line": 212,
+          "params": [],
+          "description": "Get summary of current session"
+        }
+      ],
+      "has_tests": true
+    }
+  },
+  "functions": {
+    "main": {
+      "file": "main.py",
+      "line": 18,
+      "description": "Punto de entrada principal",
+      "params": [],
+      "is_entry_point": true,
+      "has_tests": false
+    }
+  },
+  "command_registry": {
+    "help": {
+      "description": "Mostrar ayuda",
+      "handler": "_cmd_help",
+      "file": "core/cli_engine.py",
+      "line": 186
+    },
+    "exit": {
+      "description": "Salir de la CLI",
+      "handler": "_cmd_exit", 
+      "file": "core/cli_engine.py",
+      "line": 190
+    },
+    "status": {
+      "description": "Mostrar estado del sistema",
+      "handler": "_cmd_status",
+      "file": "core/cli_engine.py", 
+      "line": 195
+    },
+    "ls": {
+      "description": "Listar archivos",
+      "handler": "_cmd_ls",
+      "file": "core/cli_engine.py",
+      "line": 232
+    },
+    "cat": {
+      "description": "Mostrar contenido de archivo",
+      "handler": "_cmd_cat",
+      "file": "core/cli_engine.py",
+      "line": 237
+    },
+    "grep": {
+      "description": "Buscar patrón en archivos",
+      "handler": "_cmd_grep",
+      "file": "core/cli_engine.py",
+      "line": 244
+    },
+    "create": {
+      "description": "Crear nuevo archivo",
+      "handler": "_cmd_create",
+      "file": "core/cli_engine.py",
+      "line": 266
+    },
+    "edit": {
+      "description": "Editar archivo existente",
+      "handler": "_cmd_edit",
+      "file": "core/cli_engine.py",
+      "line": 276
+    },
+    "build": {
+      "description": "Construir proyecto completo",
+      "handler": "_cmd_build",
+      "file": "core/cli_engine.py",
+      "line": 289
+    },
+    "analyze": {
+      "description": "Analizar proyecto o archivo",
+      "handler": "_cmd_analyze",
+      "file": "core/cli_engine.py",
+      "line": 315
+    }
+  },
+  "templates": {
+    "python": {
+      "description": "Template para archivos Python",
+      "method": "_get_python_template",
+      "file": "workspace/file_manager.py",
+      "line": 285
+    },
+    "javascript": {
+      "description": "Template para archivos JavaScript",
+      "method": "_get_javascript_template", 
+      "file": "workspace/file_manager.py",
+      "line": 306
+    },
+    "html": {
+      "description": "Template para archivos HTML",
+      "method": "_get_html_template",
+      "file": "workspace/file_manager.py", 
+      "line": 331
+    }
+  },
+  "dependencies": {
+    "external": [
+      "sqlite3",
+      "subprocess", 
+      "pathlib",
+      "json",
+      "ast",
+      "re"
+    ],
+    "internal_imports": {
+      "core.cli_engine": ["OllamaInterface", "CommandProcessor", "ContextManager", "WorkspaceExplorer", "FileManager", "CodeAnalyzer", "UserInterface", "Settings"],
+      "context.context_manager": ["MemoryStore"],
+      "context.compression": ["ollama_interface"],
+      "workspace.file_manager": ["ollama_interface"]
+    }
+  },
+  "testing": {
+    "framework": "pytest + unittest",
+    "test_files": [
+      {
+        "file": "tests/conftest.py",
+        "description": "Pytest configuration and fixtures",
+        "fixtures": ["temp_workspace", "test_settings", "test_cli", "sample_python_file", "sample_project_structure"]
+      },
+      {
+        "file": "tests/test_cli_engine.py", 
+        "description": "Tests for CLIEngine",
+        "test_classes": ["TestCLIEngine", "TestCommandProcessing"]
+      },
+      {
+        "file": "tests/test_memory_store.py",
+        "description": "Tests for MemoryStore", 
+        "test_classes": ["TestMemoryStore", "TestMemoryStoreEdgeCases"]
+      },
+      {
+        "file": "tests/test_file_manager.py",
+        "description": "Tests for FileManager",
+        "missing": true
+      },
+      {
+        "file": "tests/test_security.py",
+        "description": "Tests for security components",
+        "missing": true
+      }
+    ],
+    "coverage_gaps": [
+      "OllamaInterface",
+      "ContextCompressor", 
+      "WorkspaceExplorer",
+      "CodeAnalyzer",
+      "UserInterface",
+      "AdvancedFormatter",
+      "Settings",
+      "ModelManager"
+    ]
+  },
+  "configuration": {
+    "models": {
+      "primary": "deepseek-r1:8b",
+      "fast": "qwen2.5-coder:1.5b",
+      "current": "qwen2.5-coder:1.5b"
+    },
+    "context": {
+      "max_tokens": 32000,
+      "compression_threshold": 0.8,
+      "memory_limit": 100
+    },
+    "files": {
+      "memory_db": "data/memory.db",
+      "context_cache": "data/context_cache.json"
+    }
+  },
+  "security": {
+    "file_security": {
+      "allowed_extensions": [".py", ".js", ".html", ".css", ".md", ".txt", ".json", ".yaml", ".yml", ".xml", ".csv", ".sql", ".sh", ".bat", ".ps1", ".dockerfile", ".env", ".gitignore", ".cfg", ".ini", ".conf", ".toml", ".lock", ".log"],
+      "forbidden_paths": ["/etc", "/usr", "/bin", "c:/windows", "c:/program files"],
+      "max_file_size": "10MB",
+      "max_files_per_session": 50
+    },
+    "logging": {
+      "security_log": "data/security.log",
+      "events_tracked": ["session_start", "path_traversal_attempt", "forbidden_path_access", "dangerous_extension", "file_created"]
+    }
+  },
+  "analysis": {
+    "strengths": [
+      "Modular architecture bien estructurada",
+      "Sistema de memoria persistente con SQLite",
+      "Manejo inteligente de contexto con compresión",
+      "Interfaz CLI rica con comandos especializados",
+      "Sistema de seguridad para validación de archivos",
+      "Templates automáticos para diferentes tipos de archivos",
+      "Análisis de código con métricas de complejidad",
+      "Soporte para múltiples modelos Ollama"
+    ],
+    "weaknesses": [
+      "Cobertura de tests incompleta (muchas clases sin tests)",
+      "Algunos módulos tienen dependencias circulares implícitas",
+      "Falta documentación de API detallada",
+      "Error handling inconsistente en algunos módulos",
+      "Algunos métodos muy largos en CLIEngine"
+    ],
+    "missing_tests": [
+      "OllamaInterface - conexión y comunicación con modelos",
+      "ContextCompressor - algoritmos de compresión",
+      "WorkspaceExplorer - navegación y búsqueda",
+      "CodeAnalyzer - análisis de código y métricas",
+      "UserInterface - formateo y colores",
+      "Settings/ModelManager - configuración"
+    ],
+    "optimization_opportunities": [
+      "Implementar caching para análisis de código repetitivos",
+      "Optimizar compresión de contexto con algoritmos más eficientes",
+      "Añadir paralelización para operaciones de archivos",
+      "Implementar lazy loading para módulos pesados",
+      "Mejorar manejo de memoria para archivos grandes"
+    ]
+  },
+  "next_steps": {
+    "critical": [
+      "Completar suite de tests para todas las clases principales",
+      "Implementar manejo robusto de errores en OllamaInterface",
+      "Documentar API de todos los módulos públicos"
+    ],
+    "enhancement": [
+      "Añadir soporte para más tipos de proyectos en build_project",
+      "Implementar análisis de código para más lenguajes",
+      "Optimizar algoritmos de compresión de contexto",
+      "Añadir configuración personalizable por usuario"
+    ],
+    "refactoring": [
+      "Dividir CLIEngine en clases más pequeñas y especializadas", 
+      "Extraer interfaz común para diferentes analizadores de código",
+      "Simplificar dependency injection entre componentes"
+    ]
+  }
+}

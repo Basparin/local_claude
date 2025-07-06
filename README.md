@@ -490,10 +490,10 @@ MIT License - Ver archivo LICENSE para detalles.
 
 ## 🤝 **Soporte y Comunidad**
 
-- **🐛 Issues**: [GitHub Issues](https://github.com/tu-usuario/local_claude/issues)
-- **💬 Discusiones**: [GitHub Discussions](https://github.com/tu-usuario/local_claude/discussions)  
-- **📚 Wiki**: [Documentación extendida](https://github.com/tu-usuario/local_claude/wiki)
-- **🚀 Roadmap**: [Proyecto público](https://github.com/tu-usuario/local_claude/projects)
+- **🐛 Issues**: [GitHub Issues](https://github.com/Basparin/local_claude/issues)
+- **💬 Discusiones**: [GitHub Discussions](https://github.com/Basparin/local_claude/discussions)  
+- **📚 Wiki**: [Documentación extendida](https://github.com/Basparin/local_claude/wiki)
+- **🚀 Roadmap**: [Proyecto público](https://github.com/Basparin/local_claude/projects)
 
 ---
 
