@@ -1,5 +1,5 @@
 {
-  "current_focus": null,
+  "current_focus": "model-switching",
   "areas": {
     "documentation-refactor": {
       "status": "completed",
@@ -21,7 +21,19 @@
       "started": null,
       "next_action": "Security fixes aplicados: .bat/.ps1 removidos, validación nombres vacíos",
       "completed": "2025-07-06T05:38:52.631664"
+    },
+    "testing-fixes": {
+      "status": "completed",
+      "progress": 100,
+      "started": "2025-07-06T05:44:40.437201",
+      "next_action": "Fixed: 3 assertion strings + Path object bug en find_files",
+      "completed": "2025-07-06T05:50:58.562467"
+    },
+    "model-switching": {
+      "status": "not_started",
+      "progress": 0,
+      "started": null
     }
   },
-  "last_updated": "2025-07-06T05:38:52.636331"
+  "last_updated": "2025-07-06T05:52:25.130496"
 }

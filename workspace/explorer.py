@@ -179,10 +179,10 @@ class WorkspaceExplorer:
         try:
             matches = []
             
-            for file_path in self.workspace_dir.rglob('*'):
+            for file_path in Path(self.workspace_dir).rglob('*'):
                 if file_path.is_file() and pattern.lower() in file_path.name.lower():
                     if not self._should_ignore_file(file_path):
-                        rel_path = file_path.relative_to(self.workspace_dir)
+                        rel_path = file_path.relative_to(Path(self.workspace_dir))
                         matches.append(str(rel_path))
             
             if not matches:
