@@ -76,5 +76,20 @@ class Settings:
     
     def should_use_fast_model(self, task_type: str) -> bool:
         """Determinar si usar el modelo rápido para una tarea"""
-        fast_tasks = ['ls', 'cat', 'grep', 'simple_question', 'status']
-        return task_type in fast_tasks
+        fast_tasks = ['ls', 'cat', 'grep', 'tree', 'find', 'status', 'help', 'context', 'history']
+        complex_tasks = ['analyze', 'build', 'edit', 'generate', 'suggest', 'complexity']
+        
+        if task_type in fast_tasks:
+            return True
+        elif task_type in complex_tasks:
+            return False
+        else:
+            # Default: usar modelo rápido para comandos simples
+            return len(task_type) < 10
+    
+    def get_optimal_model(self, task_type: str) -> str:
+        """Obtener modelo óptimo según tipo de tarea"""
+        if self.should_use_fast_model(task_type):
+            return "qwen2.5-coder:1.5b"
+        else:
+            return "deepseek-r1:8b"

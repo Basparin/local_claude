@@ -30,10 +30,11 @@
       "completed": "2025-07-06T05:50:58.562467"
     },
     "model-switching": {
-      "status": "not_started",
-      "progress": 0,
-      "started": null
+      "status": "in_progress",
+      "progress": 60,
+      "started": "2025-07-06T05:54:27.507354",
+      "next_action": "Lógica básica implementada: fast vs complex tasks, get_optimal_model()"
     }
   },
-  "last_updated": "2025-07-06T05:52:25.130496"
+  "last_updated": "2025-07-06T05:57:59.522436"
 }
