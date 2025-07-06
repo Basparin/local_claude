@@ -96,7 +96,7 @@ class OllamaInterface:
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
             return False
     
-    def chat(self, messages: List[Dict[str, str]], model_name: str = None) -> Optional[str]:
+    def chat(self, messages: List[Dict[str, str]], model_name: str = None, task_type: str = None) -> Optional[str]:
         """
         Enviar mensajes a Ollama y obtener respuesta
         
@@ -108,7 +108,13 @@ class OllamaInterface:
             Respuesta del modelo o None si hay error
         """
         if model_name is None:
-            model_name = self.current_model
+            # 🧠 SMART MODEL SWITCHING
+            if task_type:
+                from ..config.settings import Settings
+                settings = Settings()
+                model_name = settings.get_optimal_model(task_type)
+            else:
+                model_name = self.current_model
         
         try:
             # Preparar el prompt final
