@@ -1,0 +1,119 @@
+# 📋 Sistema de Changelogs - LocalClaude
+
+## 🎯 Propósito
+Este folder contiene el **sistema de tracking de cambios** estructurado para LocalClaude, complementando `project_map.json` con documentación detallada de implementaciones específicas.
+
+## 📁 Estructura de Archivos
+
+### **Formato de Nombres:**
+```
+{timestamp}_{tipo}_{resumen-cambios}
+```
+
+**Componentes:**
+1. **`timestamp`**: `YYYYMMDD_HHMMSS` (fecha/hora de inicio)
+2. **`tipo`**: 
+   - `readme` - Planificación y especificación del trabajo
+   - `changelog` - Documentación de progreso e implementación
+   - `test` - Scripts de verificación funcional
+   - `script` - Herramientas de soporte/automatización
+3. **`resumen-cambios`**: Descripción corta del área modificada
+
+### **Ejemplos:**
+- `20250106_readme_performance-optimization`
+- `20250106_changelog_performance-optimization`
+- `20250106_test_cache-system-verification`
+
+## 📋 Tipos de Documentos
+
+### **📖 README**
+**Propósito**: Planificación inicial y especificación
+**Contenido obligatorio**:
+- **Branch**: Nombre de la branch donde se trabaja
+- **Área**: Componente/módulo afectado
+- **Problema**: Descripción del issue a resolver
+- **Prioridad**: crítica/alta/media/baja
+- **Estado**: planificado/en-progreso/bloqueado/completado
+- **Objetivos**: Lista específica de entregables
+- **Criterios de éxito**: Métricas verificables
+
+### **📝 CHANGELOG**
+**Propósito**: Documentación de implementación y progreso
+**Contenido obligatorio**:
+- **Cambios implementados**: Lista detallada
+- **Archivos modificados**: Con descripción de cambios
+- **Tests añadidos/modificados**: Cobertura nueva
+- **Performance impact**: Métricas antes/después
+- **Breaking changes**: Si aplica
+- **Próximos pasos**: Tasks pendientes
+
+### **🧪 TEST**
+**Propósito**: Verificación funcional de cambios
+**Ubicación**: 
+- Tests permanentes → `tests/` folder
+- Tests específicos de changelog → `changelog/`
+**Contenido**: Scripts automatizados de verificación
+
+### **🔧 SCRIPT**
+**Propósito**: Herramientas de soporte y automatización
+**Ejemplos**: Migración de datos, setup, cleanup, análisis
+
+## 🔄 Workflow de Changelog
+
+### **Fase 1: Planificación**
+1. Crear `{timestamp}_readme_{area}` 
+2. Especificar problema, prioridad y objetivos
+3. Crear branch correspondiente
+4. Actualizar estado en README
+
+### **Fase 2: Implementación**
+1. Trabajar en la branch especificada
+2. Actualizar progreso en README (estado)
+3. Documentar cambios en tiempo real
+
+### **Fase 3: Completación**
+1. Crear `{timestamp}_changelog_{area}`
+2. Documentar implementación completa
+3. Crear tests de verificación si necesario
+4. Marcar README como completado
+5. Mergear branch y actualizar `project_map.json`
+
+## 🤖 Auto-tracking System (TODO)
+
+**Herramienta propuesta**: Script que analice automáticamente:
+- READMEs sin CHANGELOG correspondiente
+- Estados pendientes por prioridad
+- Branches sin mergear con changelogs
+- Métricas de tiempo de implementación
+- Alerts de tareas críticas estancadas
+
+**Output**: Dashboard de estado de changelogs activos
+
+## 📊 Estado Actual
+
+### **Completados**:
+- ✅ Testing Infrastructure (93% coverage achieved)
+- ✅ Performance Optimization (71,722x speedup achieved)
+
+### **En Progreso**:
+- 🔄 (Ninguno actualmente)
+
+### **Planificados**:
+- 📋 Model Switching (prioridad alta)
+- 📋 Metrics Monitoring (observability)
+
+## 📝 Reglas y Convenciones
+
+1. **Un README = Un área/problema específico**
+2. **README obligatorio antes de implementar**
+3. **CHANGELOG obligatorio al completar**
+4. **Tests para cambios críticos**
+5. **Nombres descriptivos y consistentes**
+6. **Estados actualizados en tiempo real**
+7. **No redundar con project_map.json** (este es más específico)
+
+---
+
+**Versión**: 2.0  
+**Última actualización**: 2025-01-06  
+**Responsable**: Claude Code Workflow System
