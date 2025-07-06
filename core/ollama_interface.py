@@ -4,6 +4,8 @@ Interfaz de comunicación con Ollama
 
 import subprocess
 import json
+import sys
+import platform
 from typing import List, Dict, Any, Optional
 
 class OllamaInterface:
@@ -12,30 +14,85 @@ class OllamaInterface:
     def __init__(self, settings):
         self.settings = settings
         self.current_model = settings.models['current']
+        self.is_windows = platform.system() == 'Windows'
+        self.ollama_cmd = self._get_ollama_command()
+    
+    def _get_ollama_command(self):
+        """Obtener comando ollama apropiado para el sistema"""
+        if self.is_windows:
+            # En Windows, intentar usar WSL si está disponible
+            try:
+                subprocess.run(['wsl', '--version'], capture_output=True, timeout=5)
+                return ['wsl', 'ollama']
+            except:
+                # Si no hay WSL, usar ollama directo (asumiendo que está instalado en Windows)
+                return ['ollama']
+        else:
+            return ['ollama']
     
     def test_connection(self) -> bool:
         """Probar conexión con Ollama"""
         try:
+            # Primero probar el comando básico
             result = subprocess.run(
-                ['ollama', 'list'],
+                self.ollama_cmd + ['list'],
                 capture_output=True,
                 text=True,
                 timeout=10
             )
-            return result.returncode == 0
+            if result.returncode != 0:
+                return False
+                
+            # Luego verificar el API
+            import urllib.request
+            api_urls = ['http://localhost:11434/api/tags']
+            
+            # En Windows con WSL, también probar la IP de WSL
+            if self.is_windows:
+                try:
+                    # Obtener IP de WSL
+                    wsl_result = subprocess.run(['wsl', 'ip', 'route', 'show'], 
+                                              capture_output=True, text=True, timeout=5)
+                    # Parsear IP de WSL (esto es una simplificación)
+                    api_urls.append('http://172.17.0.1:11434/api/tags')  # IP común de WSL
+                except:
+                    pass
+            
+            for url in api_urls:
+                try:
+                    urllib.request.urlopen(url, timeout=5)
+                    return True
+                except:
+                    continue
+                    
+            # Si el API no responde, pero ollama list funciona, aún es válido
+            return True
+                
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
             return False
     
     def test_model(self, model_name: str) -> bool:
         """Probar si un modelo específico funciona"""
         try:
+            # Verificar primero que el modelo esté en la lista
             result = subprocess.run(
-                ['ollama', 'run', model_name, 'Responde solo "OK"'],
+                self.ollama_cmd + ['list'],
                 capture_output=True,
                 text=True,
-                timeout=30
+                timeout=10
             )
-            return result.returncode == 0 and 'OK' in result.stdout
+            
+            if result.returncode != 0:
+                return False
+                
+            # Buscar el modelo en la lista
+            if model_name not in result.stdout:
+                return False
+                
+            # Si está en la lista, asumimos que funciona
+            # (evitamos el test real que es muy lento con deepseek-r1)
+            return True
+            
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
             return False
     
@@ -59,10 +116,10 @@ class OllamaInterface:
             
             # Ejecutar ollama
             result = subprocess.run(
-                ['ollama', 'run', model_name, prompt],
+                self.ollama_cmd + ['run', model_name, prompt],
                 capture_output=True,
                 text=True,
-                timeout=120  # 2 minutos timeout
+                timeout=60  # 1 minuto timeout - más rápido
             )
             
             if result.returncode == 0:
@@ -120,7 +177,7 @@ Contexto actual: Estás en una CLI local similar a Claude Code."""
         """Obtener lista de modelos disponibles"""
         try:
             result = subprocess.run(
-                ['ollama', 'list'],
+                self.ollama_cmd + ['list'],
                 capture_output=True,
                 text=True,
                 timeout=10

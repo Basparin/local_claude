@@ -86,7 +86,8 @@ class CLIEngine:
         self.ui.show_welcome()
         
         # Verificar conexión con Ollama
-        if not self.ollama.test_connection():
+        connection_result = self.ollama.test_connection()
+        if not connection_result:
             self.ui.show_error("No se pudo conectar con Ollama. Verifica que esté corriendo.")
             return
         

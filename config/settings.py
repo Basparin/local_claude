@@ -17,7 +17,7 @@ class Settings:
         self.models = {
             'primary': 'deepseek-r1:8b',    # Modelo principal para razonamiento
             'fast': 'qwen2.5-coder:1.5b',   # Modelo rápido para tareas simples
-            'current': 'deepseek-r1:8b'     # Modelo actual en uso
+            'current': 'qwen2.5-coder:1.5b'     # Modelo actual en uso (cambiado a rápido)
         }
         
         # Configuración de contexto
@@ -34,7 +34,7 @@ class Settings:
             'response_prefix': '🤖 Claude: ',
             'command_prefix': '/',
             'colors': True,
-            'debug': False
+            'debug': False  # Debug deshabilitado
         }
         
         # Configuración de archivos
