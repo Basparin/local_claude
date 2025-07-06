@@ -727,5 +727,73 @@
       "Extraer interfaz común para diferentes analizadores de código",
       "Simplificar dependency injection entre componentes"
     ]
+  },
+  "workflow": {
+    "type": "Git branches con memoria persistente",
+    "memory_files": [
+      "project_map.json",
+      "README.md", 
+      "PLAN_IMPLEMENTACION.md"
+    ],
+    "active_branches": [
+      {
+        "name": "feature/performance-optimization",
+        "priority": "high",
+        "objective": "Reducir análisis de 30-60s a 5-15s",
+        "tasks": ["parallel processing", "model caching", "incremental analysis"],
+        "estimated_days": "7-10"
+      },
+      {
+        "name": "feature/model-switching", 
+        "priority": "high",
+        "objective": "Switching automático según complejidad",
+        "tasks": ["task complexity analyzer", "smart model router"],
+        "estimated_days": "3-4"
+      },
+      {
+        "name": "fix/testing-infrastructure",
+        "priority": "critical", 
+        "objective": "90% tests passing, 80% coverage",
+        "tasks": ["arreglar 28 failing tests", "E2E actualizados"],
+        "estimated_days": "5"
+      },
+      {
+        "name": "feature/metrics-monitoring",
+        "priority": "medium",
+        "objective": "Dashboard de performance en tiempo real", 
+        "tasks": ["performance metrics", "usage analytics"],
+        "estimated_days": "2-3"
+      }
+    ],
+    "memory_update_protocol": {
+      "rule": "TODO CAMBIO DEBE ACTUALIZARSE EN project_map.json",
+      "triggers": [
+        "nuevas funciones/clases añadidas",
+        "tests implementados o modificados",
+        "dependencies cambiadas", 
+        "performance mejorada/degradada",
+        "status de implementación cambiado"
+      ],
+      "required_updates": [
+        "methods.performance status",
+        "methods.tested status", 
+        "analysis.last_updated date",
+        "dependencies si cambian",
+        "testing.coverage_gaps si mejora"
+      ]
+    },
+    "commit_requirements": [
+      "project_map.json actualizado",
+      "cambios reflejados en memoria persistente",
+      "fecha last_updated cambiada",
+      "commit message con cambios en project_map"
+    ]
+  },
+  "metadata": {
+    "last_updated": "2024-12-06",
+    "workflow_version": "1.0",
+    "memory_persistent_files": 3,
+    "claude_persistent_mode": true,
+    "organized_by_projects": true
   }
 }
