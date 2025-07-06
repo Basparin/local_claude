@@ -1,155 +1,114 @@
-# 🧠 CLAUDE.md - Contexto Principal para Claude
+# 🧠 CLAUDE.md - Instrucciones de Workflow para Claude
 
-## 📋 Proyecto Actual
+## 🎯 INICIO DE SESIÓN RÁPIDO
 
-**LocalClaude** - CLI inteligente que aspira a ser **colaborador IA avanzado** para proyectos complejos.
-
-### 🎯 Objetivo de Evolución
-- **Estado Actual**: CLI funcional con base sólida (70% implementado)
-- **Objetivo**: Colaborador autónomo para AGI, sistemas complejos, research de IA
-- **Arquitectura**: 14 clases principales, 20+ comandos, memoria persistente
-
-### 🏗️ Arquitectura Core
-```
-core/                    # Motor central - CLI engine + Ollama interface
-context/                 # Memoria persistente - SQLite + compresión
-workspace/               # Análisis y manipulación - código + proyectos  
-security/                # Controles activos - validación + logs
-ui/                      # Interfaz profesional - colores + formateo
-```
-
-## 📊 Estado Actual del Desarrollo
-
-### ✅ Completado
-- **Performance Optimization** (71,722x speedup con cache)
-- **Arquitectura sólida** (14 clases mapeadas)
-- **CLI funcional** (20+ comandos funcionando)
-- **Memoria persistente** (SQLite + contexto)
-- **Seguridad activa** (validación completa)
-
-### 🔄 En Progreso
-Ver estado actual con: `python3 changelog/changelog_tracker.py --context`
-
-## 🧠 Sistema de Memoria Persistente
-
-LocalClaude usa **memoria distribuida** optimizada para colaboración con Claude:
-
-### 📁 Documentos Estáticos (cambios solo en saltos grandes)
-- **CLAUDE.md** (este archivo) - Contexto principal
-- **README.md** - Documentación pública
-- **CLAUDE_WORKFLOW.md** - Protocolos de trabajo estables
-- **changelog/README** - Sistema de tracking
-
-### 📊 Documentos Dinámicos (actualizaciones constantes)
-- **project_map.json** - Arquitectura + estado de clases
-- **changelog_state.json** - Estado actual + progreso
-- **changelog/{timestamps}** - Tracking granular de implementaciones
-
-## 🔄 Workflow para Claude
-
-### 1. Inicio de Sesión
+**SIEMPRE ejecutar al inicio de cada sesión:**
 ```bash
-# Ver contexto actual
+# Ver estado actual del proyecto
 python3 changelog/changelog_tracker.py --context
 
-# Ver protocolos de trabajo
-cat CLAUDE_WORKFLOW.md
+# Ver roadmap actualizado
+python3 changelog/changelog_tracker.py --roadmap
 ```
 
-### 2. Durante Desarrollo
+**El proyecto es LocalClaude** - CLI conversacional en evolución hacia colaborador IA.
+
+## 📋 DOCUMENTACIÓN CLAVE A CONSULTAR
+
+### **🔍 Estado del Proyecto (Consultar SIEMPRE)**
+1. **`changelog_state.json`** - Estado actual + progreso en tiempo real
+2. **`project_map.json`** - Arquitectura + 15 clases + métricas  
+3. **`ROADMAP_DETERMINISTICO.md`** - Estado completación (auto-generado)
+4. **`ROADMAP_PLANNING.md`** - Próximas 4 funcionalidades (persistente)
+
+### **📖 Documentación de Referencia**
+1. **`README.md`** (root) - Visión conversacional del proyecto
+2. **`changelog/README`** - Workflow de desarrollo y branches
+3. **`CLAUDE_WORKFLOW.md`** - Protocolos estables de trabajo
+4. **`changelog/{timestamp}_readme_{area}`** - Specs de funcionalidades específicas
+
+## 🔄 WORKFLOW OPERATIVO
+
+### **⚡ Al Iniciar Trabajo en Funcionalidad**
+1. **Focus**: `python3 changelog/changelog_tracker.py --focus [area]`
+2. **Branch**: `git checkout -b feature/[area]` (si no existe)
+3. **README**: Leer `changelog/{timestamp}_readme_{area}` para objetivos
+
+### **📊 Durante Desarrollo**
+1. **Progreso**: `python3 changelog/changelog_tracker.py --progress [area] [%] --next "acción"`
+2. **Commits**: Usar conventional commits (feat:, fix:, refactor:)
+3. **Tests**: Verificar que pasan - `python -m pytest tests/`
+
+### **✅ Al Completar**
+1. **Complete**: `python3 changelog/changelog_tracker.py --complete [area]`
+2. **Changelog**: Crear `changelog/{timestamp}_changelog_{area}` con detalles
+3. **Tests**: Asegurar 100% passing
+4. **Merge**: Solo después de testing completo
+
+## 🎯 COMANDOS ESENCIALES
+
+### **Estado Actual**
 ```bash
-# Actualizar progreso
-python3 changelog/changelog_tracker.py --progress [area] [%] --next "acción"
-
-# Cambiar enfoque
-python3 changelog/changelog_tracker.py --focus [nueva-area]
-
-# Consultar arquitectura
-jq '.classes' project_map.json
+python3 changelog/changelog_tracker.py --context     # Estado + progreso
+python3 changelog/changelog_tracker.py --roadmap     # Roadmap actualizado
+cat changelog_state.json                             # Estado raw
 ```
 
-### 3. Al Completar Trabajo
+### **Arquitectura** 
 ```bash
-# Marcar completado
-python3 changelog/changelog_tracker.py --complete [area]
-
-# Actualizar project_map.json si hay cambios arquitecturales
-# Crear changelog detallado si es implementación importante
+cat project_map.json                                 # Arquitectura completa
+python3 -c "import json; print('\n'.join(json.load(open('project_map.json'))['classes'].keys()))"
 ```
 
-## 🎯 Prioridades de Desarrollo
-
-Las prioridades actuales se mantienen dinámicamente en:
-- `changelog_state.json` - Enfoque actual + progreso
-- `changelog/` - READMEs de planificación + CHANGELOGs de implementación
-- Roadmap auto-generado: `python3 changelog/changelog_tracker.py --roadmap`
-
-## 📋 Reglas de Trabajo Estables
-
-### ✅ Siempre
-- Actualizar estado en `changelog_tracker.py` al avanzar
-- Documentar cambios arquitecturales en `project_map.json`
-- Seguir protocolos definidos en `CLAUDE_WORKFLOW.md`
-- Mantener memoria persistente actualizada
-
-### ❌ Nunca
-- Modificar documentos estáticos sin justificación
-- Trabajar sin consultar contexto actual
-- Hacer cambios sin actualizar tracking
-- Perder trazabilidad de decisiones
-
-## 🧬 Evolución del Sistema
-
-### Fase Actual: CLI Inteligente
-- ✅ Arquitectura robusta
-- ✅ Performance optimizada
-- 🔄 Testing infrastructure
-- 📋 Model switching planificado
-
-### Próxima Fase: Colaborador IA
-- 🎯 Switching automático inteligente
-- 🎯 Memoria semántica avanzada
-- 🎯 Integración con herramientas externas
-- 🎯 Análisis profundo de proyectos
-
-### Visión Final: Colaborador AGI
-- 🌟 Autonomía en tareas complejas
-- 🌟 Multi-agente colaborativo
-- 🌟 Self-improving capabilities
-- 🌟 Distributed compute
-
-## 🔧 Herramientas Disponibles
-
-### Análisis Inmediato
+### **Testing**
 ```bash
-# Estado del tracker
+python -m pytest tests/ -v                          # Run all tests
+python -m pytest tests/test_specific.py             # Run specific test
+```
+
+## 📋 REGLAS CRÍTICAS
+
+### **✅ SIEMPRE**
+- **Actualizar tracker** con cada avance significativo
+- **Leer README de changelog** antes de trabajar en área
+- **Crear branch** para cada funcionalidad nueva
+- **Tests passing** antes de completar área
+
+### **❌ NUNCA**
+- Trabajar sin consultar `changelog_state.json`
+- Modificar `ROADMAP_PLANNING.md` (es persistente)
+- Saltarse el workflow de branches
+- Completar área con tests fallando
+
+## 🧠 MEMORIA INTELIGENTE
+
+### **Sistema de Documentos**
+- **Dinámicos**: `changelog_state.json`, `ROADMAP_DETERMINISTICO.md`
+- **Persistentes**: `ROADMAP_PLANNING.md`, `changelog/README`
+- **Por Área**: `changelog/{timestamp}_readme_{area}`
+
+### **Filosofía**
+- **Conversación natural** > Comandos rígidos
+- **Chunks de 4 funcionalidades** para progreso constante  
+- **Memory persistente** entre sesiones Claude
+- **Trazabilidad completa** de decisiones
+
+## 🎯 OBTENER ESTADO ACTUAL
+
+**SIEMPRE consultar antes de trabajar:**
+```bash
+# Estado completo + progreso actual
 python3 changelog/changelog_tracker.py --context
 
-# Arquitectura actual  
-jq '.classes | keys' project_map.json
+# Ver qué branch usar y objetivos
+cat changelog/{timestamp}_readme_{area}
 
-# Testing status
-jq '.testing.total_tests, .testing.passing_tests' project_map.json
-```
-
-### Navegación de Código
-```bash
-# Buscar clases
-jq '.classes["NombreClase"]' project_map.json
-
-# Ver métodos de una clase
-jq '.classes["CodeAnalyzer"].methods' project_map.json
-
-# Performance status
-jq '.analysis.performance_improvements' project_map.json
+# Tests status
+python -m pytest tests/ -v --tb=short
 ```
 
 ---
 
-**Este archivo proporciona el contexto esencial que Claude necesita para trabajar eficientemente en LocalClaude, manteniendo trazabilidad perfecta entre sesiones.**
-
----
-
-**Última actualización**: Sistema de memoria distribuida implementado  
-**Mantenido por**: Sistema de tracking automático  
-**Versión**: 1.0 (estática)
+**CLAUDE.md v2.0** - Instrucciones operativas persistentes para Claude  
+**Tipo**: Documentación estática de workflow  
+**Mantenido por**: Equipo LocalClaude
