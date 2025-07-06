@@ -5,9 +5,12 @@ Analizador inteligente de código
 import ast
 import json
 import re
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple
 from collections import defaultdict, Counter
+
+from .analysis_cache import AnalysisCache
 
 class CodeAnalyzer:
     """Analizador inteligente de código y proyectos"""
@@ -16,6 +19,9 @@ class CodeAnalyzer:
         self.settings = settings
         self.ollama_interface = ollama_interface
         self.workspace_dir = settings.workspace_dir
+        
+        # Initialize intelligent caching system
+        self.cache = AnalysisCache(self.workspace_dir)
     
     def analyze_project(self, path: str = '.') -> str:
         """
@@ -46,7 +52,7 @@ class CodeAnalyzer:
     
     def analyze_file(self, file_path: str) -> str:
         """
-        Analizar un archivo específico
+        Analizar un archivo específico (con cache inteligente)
         
         Args:
             file_path: Ruta del archivo a analizar
@@ -63,16 +69,24 @@ class CodeAnalyzer:
             if not target_path.is_file():
                 return f"❌ '{file_path}' no es un archivo"
             
-            # Leer contenido
-            try:
-                with open(target_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-            except UnicodeDecodeError:
-                return f"❌ '{file_path}' parece ser un archivo binario"
+            # 🚀 OPTIMIZACIÓN: Usar cache para leer contenido
+            content = self.cache.get_file_content(target_path)
+            if content is None:
+                return f"❌ '{file_path}' parece ser un archivo binario o inaccesible"
             
-            # Analizar según el tipo de archivo
+            # 🚀 OPTIMIZACIÓN: Verificar cache de análisis LLM
+            content_hash = hashlib.md5(content.encode()).hexdigest()
+            cached_analysis = self.cache.get_llm_analysis(content_hash, 'file_analysis')
+            
+            if cached_analysis:
+                return f"📋 Análisis de {file_path} (cached):\n\n{cached_analysis}"
+            
+            # Análisis no cacheado - proceder normalmente
             file_type = self._detect_file_type(target_path)
             analysis = self._analyze_by_type(content, file_path, file_type)
+            
+            # 🚀 OPTIMIZACIÓN: Cachear resultado del análisis
+            self.cache.cache_llm_analysis(content_hash, 'file_analysis', analysis)
             
             return analysis
             
@@ -81,7 +95,7 @@ class CodeAnalyzer:
     
     def find_issues(self, path: str = '.') -> str:
         """
-        Encontrar problemas potenciales en el código
+        Encontrar problemas potenciales en el código (optimizado con cache)
         
         Args:
             path: Ruta a analizar
@@ -93,12 +107,28 @@ class CodeAnalyzer:
             target_path = Path(self.workspace_dir) / path
             issues = []
             
-            # Buscar archivos de código
-            for file_path in target_path.rglob('*'):
-                if file_path.is_file() and self._is_code_file(file_path):
-                    file_issues = self._find_file_issues(file_path)
-                    if file_issues:
-                        issues.extend(file_issues)
+            # 🚀 OPTIMIZACIÓN: Usar cache de estructura de proyecto
+            project_structure = self.cache.get_project_structure()
+            
+            if project_structure:
+                # Usar estructura cacheada
+                code_files = [
+                    self.workspace_dir / file_info['path'] 
+                    for file_info in project_structure['code_files']
+                    if str(self.workspace_dir / file_info['path']).startswith(str(target_path))
+                ]
+            else:
+                # Fallback al método original
+                code_files = [
+                    file_path for file_path in target_path.rglob('*')
+                    if file_path.is_file() and self._is_code_file(file_path)
+                ]
+            
+            # Analizar archivos de código encontrados
+            for file_path in code_files:
+                file_issues = self._find_file_issues(file_path)
+                if file_issues:
+                    issues.extend(file_issues)
             
             if not issues:
                 return "✅ No se encontraron problemas obvios en el código"
@@ -172,17 +202,40 @@ class CodeAnalyzer:
             if not str(target_path).endswith('.py'):
                 return f"❌ Solo se puede analizar complejidad de archivos Python"
             
-            with open(target_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+            # 🚀 OPTIMIZACIÓN: Usar cache para contenido y AST
+            content = self.cache.get_file_content(target_path)
+            if content is None:
+                return f"❌ No se pudo leer el archivo '{file_path}'"
             
-            # Parsear AST
-            try:
-                tree = ast.parse(content)
-            except SyntaxError as e:
-                return f"❌ Error de sintaxis en línea {e.lineno}: {e.msg}"
+            # Intentar obtener análisis AST del cache
+            ast_analysis = self.cache.get_ast_analysis(target_path, content)
             
-            # Calcular métricas
-            metrics = self._calculate_ast_metrics(tree)
+            if ast_analysis:
+                # Usar datos del cache
+                functions_count = len(ast_analysis['functions'])
+                classes_count = len(ast_analysis['classes'])
+                imports_count = len(ast_analysis['imports'])
+                complexity_score = ast_analysis['complexity_score']
+                
+                # Crear métricas desde el cache
+                metrics = {
+                    'functions': functions_count,
+                    'classes': classes_count, 
+                    'imports': imports_count,
+                    'complexity': complexity_score,
+                    'lines': len(content.splitlines()),
+                    'cached': True
+                }
+            else:
+                # Parsear AST (fallback)
+                try:
+                    tree = ast.parse(content)
+                except SyntaxError as e:
+                    return f"❌ Error de sintaxis en línea {e.lineno}: {e.msg}"
+                
+                # Calcular métricas
+                metrics = self._calculate_ast_metrics(tree)
+                metrics['cached'] = False
             
             # Formatear resultados
             result = f"📊 Análisis de complejidad para '{file_path}':\n\n"
@@ -609,3 +662,37 @@ Responde de forma concisa y práctica."""
                 directories.add(path_parts[0])
         
         return ", ".join(sorted(list(directories)[:8]))
+    
+    def get_cache_stats(self) -> str:
+        """
+        Obtener estadísticas del sistema de cache
+        
+        Returns:
+            Estadísticas formateadas del cache
+        """
+        stats = self.cache.get_cache_stats()
+        
+        result = "📊 Estadísticas del Cache de Análisis:\n\n"
+        result += f"📁 Contenido de archivos cacheado: {stats['file_content_cache_size']}\n"
+        result += f"🌳 Análisis AST cacheado: {stats['ast_cache_size']}\n"
+        result += f"🤖 Análisis LLM cacheado: {stats['analysis_cache_size']}\n"
+        result += f"📋 Estructura de proyecto: {'✅ Cacheada' if stats['project_structure_cached'] else '❌ No cacheada'}\n"
+        result += f"📏 Límite máximo: {stats['max_cache_size']} entradas por cache\n\n"
+        
+        total_cached = stats['file_content_cache_size'] + stats['ast_cache_size'] + stats['analysis_cache_size']
+        if total_cached > 0:
+            result += f"🚀 Total: {total_cached} elementos cacheados - acelera análisis repetitivos"
+        else:
+            result += "📝 Cache vacío - se poblará con el uso"
+            
+        return result
+    
+    def clear_analysis_cache(self) -> str:
+        """
+        Limpiar el cache de análisis
+        
+        Returns:
+            Mensaje de confirmación
+        """
+        self.cache.clear_cache()
+        return "🧹 Cache de análisis limpiado - próximos análisis serán recalculados"

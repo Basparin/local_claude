@@ -68,6 +68,10 @@ class CLIEngine:
         self.command_processor.register_command('suggest', self._cmd_suggest)
         self.command_processor.register_command('complexity', self._cmd_complexity)
         
+        # Registrar comandos de performance/cache
+        self.command_processor.register_command('cache-stats', self._cmd_cache_stats)
+        self.command_processor.register_command('cache-clear', self._cmd_cache_clear)
+        
         # Registrar comandos de contexto avanzado
         self.command_processor.register_command('compress', self._cmd_compress)
         self.command_processor.register_command('summary', self._cmd_summary)
@@ -490,3 +494,11 @@ class CLIEngine:
         result += f"💾 Tamaño de memoria: {size_str}\n"
         
         return result
+    
+    def _cmd_cache_stats(self, args: list) -> str:
+        """Mostrar estadísticas del cache de análisis"""
+        return self.code_analyzer.get_cache_stats()
+    
+    def _cmd_cache_clear(self, args: list) -> str:
+        """Limpiar cache de análisis"""
+        return self.code_analyzer.clear_analysis_cache()
