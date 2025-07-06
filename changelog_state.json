@@ -16,10 +16,12 @@
       "completed": "2025-07-06T05:34:00.897515"
     },
     "resolve-testing-conflict": {
-      "status": "not_started",
-      "progress": 0,
-      "started": null
+      "status": "completed",
+      "progress": 100,
+      "started": null,
+      "next_action": "Security fixes aplicados: .bat/.ps1 removidos, validación nombres vacíos",
+      "completed": "2025-07-06T05:38:22.082859"
     }
   },
-  "last_updated": "2025-07-06T05:35:26.126271"
+  "last_updated": "2025-07-06T05:38:22.082871"
 }

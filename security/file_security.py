@@ -17,7 +17,7 @@ class FileSecurityManager:
     # Allowed file extensions for creation
     ALLOWED_EXTENSIONS = {
         '.py', '.js', '.html', '.css', '.md', '.txt', '.json', '.yaml', '.yml',
-        '.xml', '.csv', '.sql', '.sh', '.bat', '.ps1', '.dockerfile', '.env',
+        '.xml', '.csv', '.sql', '.sh', '.dockerfile', '.env',
         '.gitignore', '.cfg', '.ini', '.conf', '.toml', '.lock', '.log'
     }
     
@@ -79,6 +79,11 @@ class FileSecurityManager:
             Tuple of (is_valid, error_message)
         """
         try:
+            # Check for empty or invalid file path
+            if not file_path or not file_path.strip():
+                self._log_security_event("empty_filename", "Attempted creation with empty filename")
+                return False, "❌ Nombre de archivo vacío no permitido"
+            
             # Convert to Path object and resolve
             path = Path(file_path)
             
