@@ -19,6 +19,12 @@ from ui.interface import UserInterface
 from config.settings import Settings
 from monitoring.metrics import get_metrics_collector
 
+# Conversational system imports
+from core.nlp_parser import NLPParser
+from core.conversation_engine import ConversationEngine
+from core.intent_router import IntentRouter
+from core.response_generator import ResponseGenerator
+
 class CLIEngine:
     """Motor principal de la CLI"""
     
@@ -39,8 +45,34 @@ class CLIEngine:
         self.command_processor = CommandProcessor(settings)
         self.ui = UserInterface(settings)
         
+        # Inicializar sistema conversacional
+        self.nlp_parser = NLPParser()
+        self.conversation_engine = ConversationEngine(max_context_turns=10)
+        self.intent_router = IntentRouter(self.conversation_engine)
+        self.response_generator = ResponseGenerator()
+        
+        # Configurar conversational system
+        self._setup_conversational_system()
+        
         # Configurar procesador de comandos
         self._setup_command_processor()
+    
+    def _setup_conversational_system(self):
+        """Configurar sistema conversacional"""
+        # Configurar intent router con LLM interface
+        self.intent_router.set_llm_interface(self.ollama)
+        
+        # Configurar workspace tools para el router
+        workspace_tools = {
+            "code_analyzer": self.code_analyzer,
+            "workspace_explorer": self.workspace_explorer,
+            "file_manager": self.file_manager
+        }
+        self.intent_router.set_workspace_tools(workspace_tools)
+        
+        # Iniciar sesión conversacional
+        session_id = self.conversation_engine.start_conversation()
+        self.ui.show_debug(f"Sesión conversacional iniciada: {session_id}")
     
     def _setup_command_processor(self):
         """Configurar el procesador de comandos"""
@@ -53,6 +85,7 @@ class CLIEngine:
         self.command_processor.register_command('clear', self._cmd_clear)
         self.command_processor.register_command('model', self._cmd_model)
         self.command_processor.register_command('metrics', self._cmd_metrics)
+        self.command_processor.register_command('conversation', self._cmd_conversation)
         
         # Registrar comandos de workspace
         self.command_processor.register_command('ls', self._cmd_ls)
@@ -162,30 +195,64 @@ class CLIEngine:
             raise
     
     def _handle_conversation(self, user_input: str):
-        """Manejar conversación normal con la LLM"""
-        # Agregar mensaje del usuario al contexto
-        self.context_manager.add_user_message(user_input)
+        """Manejar conversación con sistema conversacional avanzado"""
+        start_time = time.time()
         
-        # Determinar qué modelo usar
-        model_name = self._select_model_for_task(user_input)
-        
-        # Obtener contexto actual
-        context = self.context_manager.get_context_for_llm()
-        
-        # Mostrar indicador de procesamiento
-        self.ui.show_thinking()
-        
-        # Obtener respuesta de la LLM
-        response = self.ollama.chat(context, model_name)
-        
-        if response:
-            # Mostrar respuesta
-            self.ui.show_response(response)
+        try:
+            # 1. Parse de intención usando NLP Parser
+            parsed_intent = self.nlp_parser.parse(user_input)
             
-            # Agregar respuesta al contexto
-            self.context_manager.add_assistant_message(response)
-        else:
-            self.ui.show_error("No se pudo obtener respuesta del modelo")
+            # Log del intent detectado
+            if self.settings.cli['debug']:
+                self.ui.show_debug(f"Intent detectado: {parsed_intent.intent.value} (confianza: {parsed_intent.confidence:.2f})")
+            
+            # 2. Router intención a través del Intent Router
+            self.ui.show_thinking()
+            route_result = self.intent_router.route_intent(user_input, parsed_intent)
+            
+            # 3. Generar respuesta formateada con Response Generator
+            conversation_context = self.conversation_engine.get_context_for_llm()
+            formatted_result = self.response_generator.generate_response(
+                route_result["response"],
+                parsed_intent,
+                route_result,
+                conversation_context
+            )
+            
+            # 4. Mostrar respuesta al usuario
+            self.ui.show_response(formatted_result["presentation"])
+            
+            # 5. Métricas y logging
+            execution_time = time.time() - start_time
+            self.metrics.log_command('conversation', execution_time, success=route_result["success"])
+            
+            # Log adicional para debugging
+            if self.settings.cli['debug']:
+                self.ui.show_debug(f"Manejado por: {route_result['handled_by']} | Tiempo: {execution_time:.2f}s")
+                if formatted_result["metadata"].confidence_level == "low":
+                    self.ui.show_debug("⚠️ Respuesta de baja confianza")
+            
+            # 6. Agregar al contexto legacy si es necesario
+            self.context_manager.add_user_message(user_input)
+            self.context_manager.add_assistant_message(route_result["response"])
+            
+        except Exception as e:
+            # Manejo de errores con response generator
+            error_response = self.response_generator.create_error_response(
+                f"Error procesando conversación: {str(e)}",
+                parsed_intent if 'parsed_intent' in locals() else None
+            )
+            
+            self.ui.show_error(error_response["presentation"])
+            
+            # Métricas de error
+            execution_time = time.time() - start_time
+            self.metrics.log_command('conversation', execution_time, success=False)
+            self.metrics.log_error('conversation_error', str(e), {'input': user_input})
+            
+            if self.settings.cli['debug']:
+                import traceback
+                traceback.print_exc()
     
     def _select_model_for_task(self, user_input: str) -> str:
         """Seleccionar modelo apropiado para la tarea"""
@@ -290,6 +357,54 @@ class CLIEngine:
             
         except Exception as e:
             return f"❌ Error obteniendo métricas: {e}"
+    
+    def _cmd_conversation(self, args: list) -> str:
+        """Mostrar estado del sistema conversacional"""
+        try:
+            # Obtener contexto conversacional
+            context = self.conversation_engine.get_context_for_llm()
+            session_summary = self.conversation_engine.get_session_summary()
+            
+            result = "💬 **Estado del Sistema Conversacional**\n\n"
+            
+            if self.conversation_engine.current_context:
+                # Información de sesión
+                result += f"🆔 **Sesión**: {session_summary.get('session_id', 'N/A')}\n"
+                result += f"⏱️  **Duración**: {session_summary.get('duration_minutes', 0):.1f} minutos\n"
+                result += f"🔢 **Turnos**: {session_summary.get('total_turns', 0)} ({session_summary.get('successful_turns', 0)} exitosos)\n"
+                result += f"✅ **Tasa de éxito**: {session_summary.get('success_rate', 0):.1%}\n\n"
+                
+                # Contexto actual
+                result += "🎯 **Contexto Actual**:\n"
+                result += f"  • **Tarea**: {context.get('current_task', 'Ninguna')}\n"
+                result += f"  • **Target**: {context.get('current_target', 'Ninguno')}\n"
+                
+                recent_actions = context.get('recent_actions', [])
+                if recent_actions:
+                    result += f"  • **Acciones recientes**: {', '.join(recent_actions[-3:])}\n"
+                
+                # Patrones del usuario
+                patterns = context.get('user_patterns', {})
+                if patterns.get('most_common_intent'):
+                    result += f"  • **Intent frecuente**: {patterns['most_common_intent']}\n"
+                
+                # Sugerencias
+                suggestions = context.get('suggested_continuations', [])
+                if suggestions:
+                    result += "\n💡 **Sugerencias**:\n"
+                    for suggestion in suggestions[:2]:
+                        result += f"  • {suggestion}\n"
+            else:
+                result += "❌ No hay sesión conversacional activa\n"
+            
+            # Configuración del NLP Parser
+            result += f"\n🧠 **NLP Parser**: Threshold {self.nlp_parser.confidence_threshold}\n"
+            result += f"🔧 **Intent Router**: {len(self.intent_router.direct_handlers)} handlers directos\n"
+            
+            return result
+            
+        except Exception as e:
+            return f"❌ Error obteniendo estado conversacional: {e}"
     
     # Comandos de workspace
     def _cmd_ls(self, args: list) -> str:
