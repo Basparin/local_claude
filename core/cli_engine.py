@@ -17,6 +17,7 @@ from workspace.file_manager import FileManager
 from workspace.code_analyzer import CodeAnalyzer
 from ui.interface import UserInterface
 from config.settings import Settings
+from monitoring.metrics import get_metrics_collector
 
 class CLIEngine:
     """Motor principal de la CLI"""
@@ -24,6 +25,9 @@ class CLIEngine:
     def __init__(self, settings: Settings):
         self.settings = settings
         self.running = False
+        
+        # Inicializar métricas
+        self.metrics = get_metrics_collector()
         
         # Inicializar componentes
         self.ollama = OllamaInterface(settings)
@@ -48,6 +52,7 @@ class CLIEngine:
         self.command_processor.register_command('context', self._cmd_context)
         self.command_processor.register_command('clear', self._cmd_clear)
         self.command_processor.register_command('model', self._cmd_model)
+        self.command_processor.register_command('metrics', self._cmd_metrics)
         
         # Registrar comandos de workspace
         self.command_processor.register_command('ls', self._cmd_ls)
@@ -118,22 +123,43 @@ class CLIEngine:
     
     def _process_user_input(self, user_input: str):
         """Procesar entrada del usuario"""
-        # Verificar si es un comando especial
-        if user_input.startswith(self.settings.cli['command_prefix']):
-            # Es un comando especial
-            command_result = self.command_processor.process_command(user_input)
-            if command_result:
-                self.ui.show_message(command_result)
-                
-                # Registrar uso del comando
+        start_time = time.time()
+        
+        try:
+            # Verificar si es un comando especial
+            if user_input.startswith(self.settings.cli['command_prefix']):
+                # Es un comando especial
                 command_name = user_input[1:].split()[0] if len(user_input) > 1 else ''
-                if command_name:
-                    self.context_manager.memory_store.record_command_usage(
-                        command_name, self.context_manager.session_id
-                    )
-        else:
-            # Es una conversación normal
-            self._handle_conversation(user_input)
+                command_result = self.command_processor.process_command(user_input)
+                
+                # Calcular tiempo de ejecución
+                execution_time = time.time() - start_time
+                
+                # Registrar métricas
+                self.metrics.log_command(command_name, execution_time, success=True)
+                
+                if command_result:
+                    self.ui.show_message(command_result)
+                    
+                    # Registrar uso del comando (legacy)
+                    if command_name:
+                        self.context_manager.memory_store.record_command_usage(
+                            command_name, self.context_manager.session_id
+                        )
+            else:
+                # Es una conversación normal
+                self._handle_conversation(user_input)
+                
+        except Exception as e:
+            # Registrar error
+            execution_time = time.time() - start_time
+            command_name = user_input[1:].split()[0] if user_input.startswith(self.settings.cli['command_prefix']) else 'conversation'
+            
+            self.metrics.log_command(command_name, execution_time, success=False)
+            self.metrics.log_error('command_execution', str(e), {'input': user_input})
+            
+            # Re-lanzar excepción
+            raise
     
     def _handle_conversation(self, user_input: str):
         """Manejar conversación normal con la LLM"""
@@ -231,6 +257,39 @@ class CLIEngine:
             return f"✅ Modelo cambiado a: {new_model}"
         else:
             return f"❌ Modelo no disponible: {new_model}"
+    
+    def _cmd_metrics(self, args: list) -> str:
+        """Mostrar métricas del sistema"""
+        try:
+            summary = self.metrics.get_session_summary()
+            
+            result = "📊 **Métricas de Sesión Actual**\n\n"
+            
+            # Información general
+            duration_mins = summary['session_duration'] / 60
+            result += f"⏱️  **Duración**: {duration_mins:.1f} minutos\n"
+            result += f"🔢 **Comandos ejecutados**: {summary['commands_executed']}\n"
+            result += f"⚡ **Tiempo promedio**: {summary['avg_response_time']:.3f}s\n"
+            result += f"❌ **Errores**: {summary['errors_count']}\n\n"
+            
+            # Cache performance
+            result += f"💾 **Cache Hit Rate**: {summary['cache_hit_rate']:.1f}%\n\n"
+            
+            # Modelos utilizados
+            if summary['models_used']:
+                result += "🤖 **Modelos utilizados**:\n"
+                for model, count in summary['models_used'].items():
+                    result += f"  • {model}: {count} veces\n"
+            else:
+                result += "🤖 **Modelos**: Ninguno usado aún\n"
+            
+            # Guardar estado actual
+            self.metrics.save_current_state()
+            
+            return result
+            
+        except Exception as e:
+            return f"❌ Error obteniendo métricas: {e}"
     
     # Comandos de workspace
     def _cmd_ls(self, args: list) -> str:

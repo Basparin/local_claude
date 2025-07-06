@@ -6,7 +6,9 @@ import subprocess
 import json
 import sys
 import platform
+import time
 from typing import List, Dict, Any, Optional
+from monitoring.metrics import get_metrics_collector
 
 class OllamaInterface:
     """Interfaz para comunicarse con Ollama"""
@@ -16,6 +18,7 @@ class OllamaInterface:
         self.current_model = settings.models['current']
         self.is_windows = platform.system() == 'Windows'
         self.ollama_cmd = self._get_ollama_command()
+        self.metrics = get_metrics_collector()
     
     def _get_ollama_command(self):
         """Obtener comando ollama apropiado para el sistema"""
@@ -107,6 +110,8 @@ class OllamaInterface:
         Returns:
             Respuesta del modelo o None si hay error
         """
+        start_time = time.time()
+        
         if model_name is None:
             # 🧠 SMART MODEL SWITCHING
             if task_type:
@@ -128,19 +133,44 @@ class OllamaInterface:
                 timeout=60  # 1 minuto timeout - más rápido
             )
             
+            # Calcular tiempo de respuesta
+            response_time = time.time() - start_time
+            
             if result.returncode == 0:
+                # Registrar métricas de éxito
+                self.metrics.log_model_usage(model_name, task_type or 'unknown', response_time)
                 return result.stdout.strip()
             else:
+                # Registrar error
+                self.metrics.log_error('ollama_execution', result.stderr, {
+                    'model': model_name,
+                    'task_type': task_type
+                })
                 print(f"❌ Error de Ollama: {result.stderr}")
                 return None
                 
         except subprocess.TimeoutExpired:
+            response_time = time.time() - start_time
+            self.metrics.log_error('ollama_timeout', f"Timeout después de {response_time:.1f}s", {
+                'model': model_name,
+                'task_type': task_type
+            })
             print("❌ Timeout: El modelo tardó demasiado en responder")
             return None
         except FileNotFoundError:
+            self.metrics.log_error('ollama_not_found', "Ollama no encontrado", {
+                'model': model_name,
+                'task_type': task_type
+            })
             print("❌ Ollama no encontrado. Asegúrate de que esté instalado y en el PATH")
             return None
         except Exception as e:
+            response_time = time.time() - start_time
+            self.metrics.log_error('ollama_unexpected', str(e), {
+                'model': model_name,
+                'task_type': task_type,
+                'response_time': response_time
+            })
             print(f"❌ Error inesperado: {e}")
             return None
     

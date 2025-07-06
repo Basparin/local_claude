@@ -1,0 +1,66 @@
+# 📖 README - Conversational Mode
+
+**Timestamp**: 2025-07-06 15:44:49  
+**Branch**: `feature/conversational-mode`  
+**Área**: conversational-mode  
+**Estado**: planificado  
+**Prioridad**: critical
+
+## 🎯 Problema
+
+Implementar modo conversacional para eliminar barrera comando/chat
+
+## 🎯 Objetivos
+
+- [ ] NLP Parser para interpretar intenciones desde lenguaje natural
+- [ ] Context Engine para mantener conversaciones fluidas
+- [ ] Intent Router para mapear conversación → acciones del sistema
+- [ ] Response Generator para respuestas naturales vs output técnico
+- [ ] Eliminar barrera comando/chat - modo unificado
+
+## ✅ Criterios de Éxito
+
+- [ ] Usuario puede escribir "Analiza este proyecto" en lugar de /analyze
+- [ ] Conversaciones fluidas sin reiniciar contexto
+- [ ] 80% reducción en comandos específicos necesarios
+- [ ] Response time <3s para intents básicos
+- [ ] Tests implementados y pasando
+- [ ] Documentación actualizada
+
+## 🔧 Implementación Planificada
+
+### **Archivos a Crear:**
+- `core/nlp_parser.py` - Parser de intenciones NLP
+- `core/conversation_engine.py` - Motor conversacional
+- `core/intent_router.py` - Router de intenciones
+- `core/response_generator.py` - Generador de respuestas naturales
+
+### **Archivos a Modificar:**
+- `core/cli_engine.py` - Integrar modo conversacional
+- `core/ollama_interface.py` - Mejorar context awareness
+- `ui/interface.py` - UX conversacional
+
+### **Tests a Implementar:**
+- `test_nlp_parser.py` - Tests de parsing de intenciones
+- `test_conversation_engine.py` - Tests de conversación
+- `test_conversational_integration.py` - Tests E2E conversacionales
+
+### **Performance Esperada:**
+- Intent parsing: <500ms
+- Context retrieval: <200ms  
+- Response generation: <2s
+- Memory efficiency: <50MB adicional
+
+## 📋 Próximos Pasos
+
+1. [ ] Crear branch `feature/conversational-mode`
+2. [ ] Implementar funcionalidad core
+3. [ ] Añadir tests
+4. [ ] Actualizar documentación
+5. [ ] Crear changelog de completación
+
+---
+
+**Creado por**: Auto-tracker de Changelogs  
+**Template generado**: 2025-07-06 15:44:49  
+**Archivo**: `changelog/20250706_154449_readme_conversational-mode`

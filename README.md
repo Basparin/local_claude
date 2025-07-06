@@ -12,8 +12,9 @@ LocalClaude está diseñado para convertirse en tu compañero inteligente para:
 - **🔬 Research Collaboration** - Papers, implementaciones, benchmarks
 - **⚡ Desarrollo de Alto Rendimiento** - Optimización, profiling, escalabilidad
 
-**Estado Actual**: CLI funcional con base sólida  
-**Objetivo**: Colaborador autónomo que entiende contexto complejo
+**Estado Actual**: CLI conversacional con inteligencia contextual  
+**Objetivo**: Colaborador IA que entiende lenguaje natural y contexto complejo  
+**Filosofía**: Conversación natural > Comandos rígidos
 
 ## 🚀 Instalación Rápida
 
@@ -38,37 +39,40 @@ cd local_claude
 python main.py
 ```
 
-## 🎯 Comandos Principales
+## 🧠 Interacción Conversacional
 
-### 🔍 Exploración Inteligente
+LocalClaude combina **comandos básicos** con **conversación natural inteligente** para máxima flexibilidad.
+
+### 🔍 Exploración Básica
 ```bash
-/ls [path]              # Listar con contexto inteligente
-/cat <file>             # Mostrar contenido con resumen
+/ls [path]              # Listar archivos y directorios
+/cat <file>             # Mostrar contenido
 /tree [path]            # Estructura de directorios
-/find <pattern>         # Búsqueda inteligente
+/find <pattern>         # Búsqueda de archivos
 ```
 
-### 🏗️ Construcción de Proyectos
+### 🤖 Conversación Inteligente
 ```bash
-/build <type> <name>    # Construir proyecto completo
-/create <file>          # Crear con template inteligente
-/generate <type>        # Generar código específico
+# En lugar de comandos rígidos, usa lenguaje natural:
+localclaude> "Analiza este proyecto y dime qué problemas tiene"
+localclaude> "Crea un microservicio con CQRS y event sourcing"
+localclaude> "Optimiza el performance de esta función"
+localclaude> "Genera un experimento PyTorch para transformers"
 ```
 
-### 📊 Análisis Avanzado
+### 📊 Sistema y Métricas
 ```bash
-/analyze [path]         # Análisis completo de proyectos
-/issues [path]          # Detectar problemas
-/complexity [path]      # Métricas de complejidad
-/suggest [path]         # Sugerencias de mejora
+/status                # Estado del sistema
+/metrics               # Métricas de performance y uso
+/context               # Estado del contexto actual
+/help                  # Ayuda y comandos disponibles
 ```
 
-### 🧠 Memoria y Contexto
-```bash
-/context               # Estado del contexto
-/memory                # Memoria persistente
-/history [limit]       # Historial de comandos
-```
+### 🧠 Inteligencia Contextual
+- **Memoria persistente**: Recuerda conversaciones y patrones
+- **Model switching**: Automático según complejidad de tarea
+- **Cache inteligente**: Optimiza respuestas repetitivas
+- **Análisis proactivo**: Sugiere mejoras automáticamente
 
 ## 📁 Arquitectura del Proyecto
 
@@ -147,27 +151,27 @@ python3 changelog/changelog_tracker.py --complete testing-fixes
 📁 Estructura completa con FastAPI, JWT, tests
 ```
 
-### 🤖 Casos de Uso Avanzados
+### 🤖 Casos de Uso Conversacionales
 
 **AGI/AI Research**
 ```bash
-/analyze transformer_model/ 
-/generate pytorch_experiment "attention mechanism variant"
-/analyze datasets/ --metrics complexity,bias,coverage
+localclaude> "Analiza mi modelo transformer, necesito optimizar la atención"
+localclaude> "Crea un experimento para probar una variante del mecanismo de atención"
+localclaude> "Evalúa este dataset, me preocupa el bias y la complejidad"
 ```
 
 **Sistemas Distribuidos**
 ```bash
-/build microservice user_service "with CQRS and event sourcing"
-/analyze microservices/ --graph dependencies
-/generate docker_compose "multi-service with observability"
+localclaude> "Diseña un microservicio de usuarios con CQRS y event sourcing"
+localclaude> "Analiza las dependencias entre mis microservicios"
+localclaude> "Genera docker-compose con observabilidad completa"
 ```
 
 **Research Collaboration**
 ```bash
-/analyze paper_implementations/ --compare baselines
-/generate benchmark "model comparison framework"
-/review codebase/ --focus performance,correctness
+localclaude> "Compara estas implementaciones con los baselines del paper"
+localclaude> "Crea un framework de benchmarking para comparar modelos"
+localclaude> "Revisa este código, enfócate en performance y correctness"
 ```
 
 ## 🛠️ Desarrollo y Contribución

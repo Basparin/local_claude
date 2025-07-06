@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 from collections import OrderedDict
+from monitoring.metrics import get_metrics_collector
 
 
 class AnalysisCache:
@@ -16,6 +17,9 @@ class AnalysisCache:
     def __init__(self, workspace_dir: str, max_cache_size: int = 100):
         self.workspace_dir = Path(workspace_dir)
         self.max_cache_size = max_cache_size
+        
+        # Métricas
+        self.metrics = get_metrics_collector()
         
         # Caches en memoria (LRU)
         self.file_content_cache: OrderedDict[str, Dict[str, Any]] = OrderedDict()
@@ -54,7 +58,11 @@ class AnalysisCache:
         if file_hash in self.file_content_cache:
             # Move to end (most recently used)
             self.file_content_cache.move_to_end(file_hash)
+            self.metrics.log_cache_hit('file_content', True)
             return self.file_content_cache[file_hash]['content']
+        
+        # Cache miss
+        self.metrics.log_cache_hit('file_content', False)
         
         # Read and cache
         try:

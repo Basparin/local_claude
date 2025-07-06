@@ -613,6 +613,139 @@ class ChangelogTracker:
         except Exception as e:
             return {"error": f"Failed to analyze roadmap: {e}"}
     
+    def _generate_updated_roadmap(self):
+        """Generar roadmap actualizado basado en el estado actual del tracker"""
+        roadmap_path = self.project_root / "ROADMAP_DETERMINISTICO.md"
+        planning_path = self.project_root / "ROADMAP_PLANNING.md"
+        
+        # Verificar si existe ROADMAP_PLANNING.md
+        has_planning = planning_path.exists()
+        
+        # Analizar estado actual
+        completed_areas = []
+        in_progress_areas = []
+        pending_areas = []
+        
+        for area_name, area_data in self.state["areas"].items():
+            status = area_data.get("status", "not_started")
+            progress = area_data.get("progress", 0)
+            
+            if status == "completed":
+                completed_areas.append({
+                    "name": area_name,
+                    "progress": progress,
+                    "completed": area_data.get("completed")
+                })
+            elif status == "in_progress":
+                in_progress_areas.append({
+                    "name": area_name,
+                    "progress": progress,
+                    "next_action": area_data.get("next_action", "")
+                })
+            else:
+                pending_areas.append({
+                    "name": area_name,
+                    "progress": progress
+                })
+        
+        # Generar contenido del roadmap
+        content = f"""# 🎯 ROADMAP ACTUALIZADO - LocalClaude
+
+**Generado**: {datetime.now().strftime('%Y-%m-%d %H:%M')}  
+**Base**: Estado actual del tracker (changelog_state.json)  
+**Sistema**: Memoria persistente distribuida
+
+---
+
+## 📊 ESTADO ACTUAL
+
+### **✅ COMPLETADO ({len(completed_areas)} tareas)**
+"""
+        
+        for area in completed_areas:
+            completed_date = area["completed"][:10] if area["completed"] else "Unknown"
+            content += f"- **{area['name'].replace('-', ' ').title()}** ✅ ({completed_date})\n"
+        
+        if in_progress_areas:
+            content += f"""
+### **🔄 EN PROGRESO ({len(in_progress_areas)} tareas)**
+"""
+            for area in in_progress_areas:
+                content += f"- **{area['name'].replace('-', ' ').title()}**: {area['progress']}% - {area['next_action']}\n"
+        
+        if pending_areas:
+            content += f"""
+### **📋 PENDIENTES ({len(pending_areas)} tareas)**
+"""
+            for area in pending_areas:
+                content += f"- **{area['name'].replace('-', ' ').title()}**: Planificado\n"
+        
+        # Estadísticas
+        total_areas = len(completed_areas) + len(in_progress_areas) + len(pending_areas)
+        completion_rate = (len(completed_areas) / max(1, total_areas)) * 100
+        
+        content += f"""
+---
+
+## 📊 MÉTRICAS DE PROYECTO
+
+### **Estado de Completación:**
+- **Total work items**: {total_areas}
+- **Completados**: {len(completed_areas)} ({completion_rate:.0f}%)
+- **En progreso**: {len(in_progress_areas)}
+- **Pendientes**: {len(pending_areas)}
+
+### **Próximas Acciones Sugeridas:**
+"""
+        
+        # Sugerir próximas acciones
+        if not in_progress_areas and pending_areas:
+            content += f"1. **Iniciar**: {pending_areas[0]['name'].replace('-', ' ').title()}\n"
+        elif in_progress_areas:
+            for area in in_progress_areas:
+                content += f"1. **Continuar**: {area['name'].replace('-', ' ').title()} ({area['progress']}%)\n"
+        
+        if completion_rate >= 75:
+            content += "\n🎉 **¡Excelente progreso!** Considera definir nuevas funcionalidades.\n"
+        
+        content += f"""
+---
+
+## 🔧 HERRAMIENTAS DE TRACKING
+
+### **Comandos de Monitoreo:**
+```bash
+# Ver estado actual
+python3 changelog/changelog_tracker.py --context
+
+# Establecer enfoque en área
+python3 changelog/changelog_tracker.py --focus [area]
+
+# Actualizar progreso
+python3 changelog/changelog_tracker.py --progress [area] [%] --next "acción"
+
+# Marcar como completado
+python3 changelog/changelog_tracker.py --complete [area]
+```
+
+---
+
+**ROADMAP ACTUALIZADO v2.0**  
+**Sistema de tracking**: changelog_state.json + Auto-tracker  
+**Próxima revisión**: Automática con cada cambio de estado  
+**Mantenido por**: ChangelogTracker System
+"""
+        
+        # Escribir archivo
+        with open(roadmap_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        print(f"✅ Roadmap actualizado: {roadmap_path}")
+        if has_planning:
+            print(f"📋 Planificación persistente: {planning_path} (NO modificado)")
+        print(f"📊 Estado: {len(completed_areas)} completadas, {len(in_progress_areas)} en progreso, {len(pending_areas)} pendientes")
+        print(f"🎯 Completación: {completion_rate:.0f}%")
+    
     def _extract_priority_items(self, text: str, pattern: str) -> List[str]:
         """Extract items from priority section"""
         match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
@@ -926,9 +1059,8 @@ def main():
         print(f"✅ Changelog README creado: {file_path}")
         
     elif args.roadmap:
-        # Placeholder para generar roadmap desde README
-        print("🔄 Generando roadmap determinístico desde README.md...")
-        print("📋 Funcionalidad pendiente de implementar")
+        print("🔄 Generando roadmap actualizado desde estado del tracker...")
+        tracker._generate_updated_roadmap()
         
     else:
         print("📋 Comandos principales para Claude:")
