@@ -115,7 +115,7 @@ class OllamaInterface:
         if model_name is None:
             # 🧠 SMART MODEL SWITCHING
             if task_type:
-                from ..config.settings import Settings
+                from config.settings import Settings
                 settings = Settings()
                 model_name = settings.get_optimal_model(task_type)
             else:

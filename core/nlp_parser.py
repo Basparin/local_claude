@@ -46,27 +46,27 @@ class NLPParser:
             IntentType.ANALYZE: [
                 {
                     "patterns": [
-                        r"analiz[ae].*?(?:proyecto|código|archivo|este|esto)",
+                        r"analiz[ae].*?(?:proyecto|código|archivo|este|esto|performance|rendimiento|sistema)",
                         r"revisa.*?(?:código|proyecto|archivo)",
                         r"qué.*?(?:problemas|issues|errores)",
                         r"dame.*?(?:análisis|reporte|resumen)",
                         r"examina.*?(?:este|esto|el|la)"
                     ],
                     "confidence": 0.9,
-                    "keywords": ["analizar", "revisar", "problemas", "análisis", "examinar", "evaluar"]
+                    "keywords": ["analizar", "revisar", "problemas", "análisis", "examinar", "evaluar", "performance", "rendimiento"]
                 }
             ],
             IntentType.CREATE: [
                 {
                     "patterns": [
-                        r"crea.*?(?:archivo|proyecto|función|clase)",
+                        r"crea.*?(?:archivo|proyecto|función|clase|api|una|un)",
                         r"genera.*?(?:código|archivo|proyecto)",
                         r"hacer.*?(?:nuevo|nueva|un|una)",
                         r"construye.*?(?:proyecto|aplicación|api)",
                         r"implementa.*?(?:función|clase|método)"
                     ],
                     "confidence": 0.85,
-                    "keywords": ["crear", "generar", "nuevo", "nueva", "construir", "implementar", "hacer"]
+                    "keywords": ["crear", "generar", "nuevo", "nueva", "construir", "implementar", "hacer", "crea", "api"]
                 }
             ],
             IntentType.FIND: [
@@ -84,13 +84,13 @@ class NLPParser:
             IntentType.OPTIMIZE: [
                 {
                     "patterns": [
-                        r"optimiza.*?(?:código|performance|rendimiento)",
+                        r"optimiza.*?(?:código|performance|rendimiento|el|uso)",
                         r"mejora.*?(?:velocidad|performance|eficiencia)",
                         r"acelera.*?(?:esto|función|código)",
                         r"reduce.*?(?:tiempo|latencia|memoria)"
                     ],
                     "confidence": 0.8,
-                    "keywords": ["optimizar", "mejorar", "acelerar", "performance", "rendimiento", "eficiencia"]
+                    "keywords": ["optimizar", "mejorar", "acelerar", "performance", "rendimiento", "eficiencia", "optimiza", "uso", "memoria"]
                 }
             ],
             IntentType.EXPLAIN: [
@@ -109,12 +109,12 @@ class NLPParser:
                 {
                     "patterns": [
                         r"(?:estado|status|situación).*?(?:actual|del|de)",
-                        r"como.*?(?:está|van|va).*?(?:proyecto|desarrollo)",
+                        r"(?:como|cómo).*?(?:está|van|va).*?(?:proyecto|desarrollo)",
                         r"progreso.*?(?:actual|del|de)",
                         r"métricas.*?(?:sistema|proyecto)"
                     ],
                     "confidence": 0.9,
-                    "keywords": ["estado", "status", "progreso", "métricas", "situación"]
+                    "keywords": ["estado", "status", "progreso", "métricas", "situación", "como", "cómo", "va", "desarrollo"]
                 }
             ],
             IntentType.HELP: [
@@ -123,10 +123,11 @@ class NLPParser:
                         r"ayuda.*?(?:con|a|para)",
                         r"(?:como|cómo).*?(?:puedo|debo|hago)",
                         r"no.*?(?:sé|entiendo|comprendo)",
-                        r"qué.*?(?:comandos|opciones|puedo)"
+                        r"qué.*?(?:comandos|opciones|puedo)",
+                        r"no\s+sé\s+qué\s+hacer"
                     ],
                     "confidence": 0.8,
-                    "keywords": ["ayuda", "como", "cómo", "puedo", "debo", "comandos", "opciones"]
+                    "keywords": ["ayuda", "como", "cómo", "puedo", "debo", "comandos", "opciones", "no", "sé", "hacer"]
                 }
             ]
         }

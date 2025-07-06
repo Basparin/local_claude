@@ -107,6 +107,11 @@ class UserInterface:
         print(self._colorize(f"✅ {success}", 'green'))
         print()
     
+    def show_debug(self, debug: str):
+        """Mostrar mensaje de debug (solo si debug está habilitado)"""
+        if self.settings.cli.get('debug', False):
+            print(self._colorize(f"🐛 {debug}", 'gray'))
+    
     def show_thinking(self):
         """Mostrar indicador de procesamiento"""
         print(self._colorize("🤔 Pensando...", 'gray'), end='', flush=True)

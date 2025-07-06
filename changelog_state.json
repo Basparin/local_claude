@@ -44,12 +44,12 @@
       "completed": "2025-07-06T15:13:50.594865"
     },
     "conversational-mode": {
-      "status": "completed",
-      "progress": 100,
+      "status": "in_progress",
+      "progress": 98,
       "started": "2025-07-06T15:32:10.487172",
-      "next_action": "NLP Parser funcional con 7 intents y confianza ajustada, iniciando Context Engine",
+      "next_action": "CLI funcional, NLP patterns mejorados, 84/86 tests passing",
       "completed": "2025-07-06T16:27:25.091824"
     }
   },
-  "last_updated": "2025-07-06T16:27:25.097599"
+  "last_updated": "2025-07-06T17:15:00.385628"
 }
